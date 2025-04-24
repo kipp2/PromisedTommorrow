@@ -13,7 +13,8 @@ class Player(pygame.sprite.Sprite):
         self.vel_y = 0
         self.on_ground = False
         self.score = 0
-
+        self.swinging = False
+        self.health = 3
         self.facing_right = True
 
     def update(self, platforms):
@@ -41,7 +42,7 @@ class Player(pygame.sprite.Sprite):
         elif direction == "right":
             self.vel_x = 5
             self.facing_right = True
-            
+
         if self.rect.right < 0:
             self.rect.left = WIDTH
         elif self.rect.left >= WIDTH:

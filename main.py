@@ -15,13 +15,20 @@ screen = pygame.display.set_mode(SIZE)
 pygame.display.set_caption("PromisedTommorrow")
 
 player = Player()
+player.rect.bottomleft = (0, HEIGHT - 100)
 weapon = Weapon(player)
 platforms = generate_platforms()
 
 # Create an enemy instance
-enemies = pygame.sprite.Group()
-enemy = Enemy(300, HEIGHT - 120)  # Example starting position for the enemy
-enemies.add(enemy)
+def spawn_enemies_on_platforms():
+    enemies = pygame.sprite.Group()
+    for plat in platforms[1:]:
+        enemy = Enemy(plat.rect.centerx - 20, plat.rect.top - 60)
+        enemy.platform = plat
+        enemies.add(enemy)
+    return enemies
+
+enemies = spawn_enemies_on_platforms()
 
 clock = pygame.time.Clock()
 running = True 
@@ -54,7 +61,6 @@ while running:
 
     # Update player and enemy
     player.update(platforms)
-    enemy.update(platforms, player)  # Pass platforms and player to the enemy's update method
     weapon.update()
 
     # Draw player and enemy
@@ -74,7 +80,9 @@ while running:
     enemies.update(platforms, player)
     for enemy in enemies:
         screen.blit(enemy.image, enemy.rect)
-        if weapon.rect.colliderect(enemy.rect):
+        if (
+            weapon.rect.colliderect(enemy.rect) and player.swinging and enemy.state != "idle"
+        ):
             enemy.take_damage()
     pygame.display.update()
 pygame.quit()
