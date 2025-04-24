@@ -29,7 +29,7 @@ class Weapon(pygame.sprite.Sprite):
 
             rotated_image = pygame.transform.rotate(self.original_image, self.angle)
             self.image = rotated_image
-            self.rect = self.image.get_rect(center=pivot)
+            self.rect = self.image.get_rect()
             self.rect.topleft = (pivot[0] + offset[0], pivot[1] + offset[1])
             self.image.set_alpha(255)
         else:

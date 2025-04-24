@@ -1,27 +1,21 @@
-from config import WIDTH, HEIGHT, BLUE, GRAVITY
 import pygame
-from pygame.locals import *
+from config import BLACK
 
 class Text:
-
-    def __init__(self, text, pos, **option):
-        self.text = str(text)
+    def __init__(self, text, pos, font_size=36, color=BLACK, font=None):
+        self.text = text
         self.pos = pos
+        self.font = pygame.font.Font(font, font_size)
+        self.color = color
+        self.render()
 
-        self.fontname = None
-        self.fontsize = 36
-        self.fontcolor = Color('black')
-        self.set_font()
-        self.render()    
-
-
-    def set_font(self):
-        self.font = pygame.font.Font(self.fontname, self.fontsize)
-    
     def render(self):
-        self.img = self.font .render(self.text, True, self.fontcolor)
-        self.rect = self.img.get_rect()
-        self.rect.topleft = self.pos
+        self.image = self.font.render(self.text, True, self.color)
+        self.rect = self.image.get_rect(topleft=self.pos)
 
     def draw(self, surface):
-        screen.blit(self.img, self.rect)
+        surface.blit(self.image, self.rect)
+
+    def update_text(self, new_text):
+        self.text = new_text
+        self.render()
