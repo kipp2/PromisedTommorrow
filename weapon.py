@@ -21,11 +21,11 @@ class Weapon(pygame.sprite.Sprite):
 
             if self.owner.facing_right:
                 pivot = (self.owner.rect.right, self.owner.rect.centery)
-                offset = (50, -5)
+                offset = (20, 5)
 
             else:
                 pivot = (self.owner.rect.left, self.owner.rect.centery)
-                offset = (-50, -5)
+                offset = (-20, -5)
 
             rotated_image = pygame.transform.rotate(self.original_image, self.angle)
             self.image = rotated_image

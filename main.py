@@ -92,11 +92,13 @@ while running:
     
         enemies.update(platforms, player)
         for enemy in enemies:
+            enemy.draw_health_bar(screen)
             screen.blit(enemy.image, enemy.rect)
             if (
             weapon.rect.colliderect(enemy.rect) and player.swinging and enemy.state != "idle"
             ):
-                enemy.take_damage()
+                direction = 1 if player.facing_right else -1
+                enemy.take_damage(direction)
     clock.tick(FPS)
     pygame.display.update()
 pygame.quit()

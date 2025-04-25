@@ -1,4 +1,4 @@
-from config import WIDTH, HEIGHT, RED, GRAVITY
+from config import WIDTH, HEIGHT, RED, GRAVITY, GREEN, BLACK
 import pygame
 
 class Enemy(pygame.sprite.Sprite):
@@ -15,11 +15,16 @@ class Enemy(pygame.sprite.Sprite):
         self.direction = 1
         self.state = "idle"
         self.attack_range = 40
+        self.knockback_timer = 0 
+        self.knockback_force = 8 
 
 
     def update(self, platforms, player):
         self.vel_y += GRAVITY
         self.rect.y += self.vel_y
+        if self.knockback_timer > 0:
+            self.rect.x += self.knockback_force * self.direction
+            self.knockback_timer -= 1
 
         self.on_ground = False
         self.platform = None
@@ -64,9 +69,23 @@ class Enemy(pygame.sprite.Sprite):
             self.rect.bottom = HEIGHT
             self.vel_y = 0
             self.on_ground = True
+        
+        
 
-    def take_damage(self):
-        self.health -= 1
+    #take damage
+    def take_damage(self, attacker_direction):
+        self.health -= 10
+        self.vel_y = -5
+        self.knockback_timer = 10
+        self.direction = -attacker_direction
         if self.health <= 0:
             self.kill()
     
+    def draw_health_bar(self, surface):
+        bar_width = 40
+        bar_height = 5
+        fill = (self.health /3 ) * bar_width
+        outline_rect = pygame.Rect(self.rect.x, self.rect.y - 10, bar_width, bar_height)
+        fill_rect = pygame.Rect(self.rect.x, self.rect.y - 10 , fill, bar_height)
+        pygame.draw.rect(surface, GREEN, fill_rect)
+        pygame.draw.rect(surface, BLACK, outline_rect)
