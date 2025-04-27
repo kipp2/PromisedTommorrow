@@ -1,5 +1,6 @@
 from config import WIDTH, HEIGHT, RED, GRAVITY, GREEN, BLACK
 import pygame
+import random
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, x, y):
@@ -7,7 +8,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.Surface((40, 60))
         self.image.fill(RED)
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.health = 3
+        self.health = 12
 
         self.vel_x = 1
         self.vel_y = 0
@@ -20,72 +21,123 @@ class Enemy(pygame.sprite.Sprite):
 
 
     def update(self, platforms, player):
+        # 1) Gravity & vertical movement
         self.vel_y += GRAVITY
         self.rect.y += self.vel_y
+
+        # 2) Knockback movement (if active)
         if self.knockback_timer > 0:
             self.rect.x += self.knockback_force * self.direction
             self.knockback_timer -= 1
+            # clamp to platform edges if still on one
+            if self.platform:
+                self.rect.left = max(self.rect.left, self.platform.rect.left)
+                self.rect.right = min(self.rect.right, self.platform.rect.right)
 
-        self.on_ground = False
+        # 3) Detect “real” platforms
         self.platform = None
-        for platform in platforms:
-            if self.rect.colliderect(platform.rect):
-                if self.vel_y > 0:
-                    self.rect.bottom = platform.rect.top
-                    self.vel_y = 0
-                    self.on_ground = True
-                    self.platform = platform
-                elif self.vel_y == 0 and self.rect.bottom == platform.rect.top:
-                    self.rect.x = max(platform.rect.left, min(self.rect.x, platform.rect.right - self.rect.width))
-                    self.platform = platform
+        self.on_ground = False
+        for plat in platforms:
+            if (self.rect.centerx > plat.rect.left + 5 and
+                self.rect.centerx < plat.rect.right - 5 and
+                abs(self.rect.bottom - plat.rect.top) < 10 and
+                self.vel_y >= 0):
+                # Snap to that platform
+                self.rect.bottom = plat.rect.top
+                self.vel_y = 0
+                self.platform = plat
+                self.on_ground = True
                 break
 
+        # 4) If no platform, snap to floor
+        if not self.platform:
+            if self.rect.bottom >= HEIGHT:
+                self.rect.bottom = HEIGHT
+                self.vel_y = 0
+                self.on_ground = True
+                self.on_floor = True
+            else:
+                self.on_floor = False
 
-        if self.platform:            
-            if abs(player.rect.bottom - self.platform.rect.top) < 10 and \
-           player.rect.right > self.platform.rect.left and \
-           player.rect.left < self.platform.rect.right:
-                distance = abs(self.rect.centerx - player.rect.centerx)
-                if distance < self.attack_range:
+        # 5) AI & movement
+        if self.platform or self.on_floor:
+            # determine if player is “on the same surface”
+            on_same_surface = False
+            if self.platform:
+                on_same_surface = (
+                    abs(player.rect.bottom - self.platform.rect.top) < 10 and
+                    player.rect.centerx > self.platform.rect.left and
+                    player.rect.centerx < self.platform.rect.right
+                )
+            else:
+                on_same_surface = self.on_floor
+
+            # distance check
+            dist = abs(self.rect.centerx - player.rect.centerx)
+            if on_same_surface:
+                if dist < self.attack_range:
                     self.state = "attack"
-                elif distance < 200: 
+                elif dist < 200:
                     self.state = "chase"
+                else:
+                    self.state = "idle"
             else:
                 self.state = "idle"
 
+            # perform movement per state
             if self.state == "chase":
-                self.direction = 1 if self.rect.centerx < player.rect.centerx else -1
+                self.direction = 1 if player.rect.centerx > self.rect.centerx else -1
+            if self.state in ("chase", "idle"):
                 self.rect.x += self.vel_x * self.direction
-            elif self.state == "idle":
-                self.rect.x += self.vel_x * self.direction
-                if self.rect.left <= self.platform.rect.left or self.rect.right >= self.platform.rect.right:
-                    self.direction *= -1
-            elif self.state == "attack":
-                pass
-            print(f"Enemy State: {self.state} | X: {self.rect.x}")
 
-        # Prevent falling below the screen
-        if self.rect.bottom > HEIGHT:
-            self.rect.bottom = HEIGHT
-            self.vel_y = 0
-            self.on_ground = True
+            # reverse at edges
+            left_bound = self.platform.rect.left if self.platform else 0
+            right_bound = self.platform.rect.right if self.platform else WIDTH
+            if self.rect.left <= left_bound or self.rect.right >= right_bound:
+                self.direction *= -1
+
+            # final clamp to keep them “on” the platform/floor
+            if self.platform:
+                self.rect.left = max(self.rect.left, left_bound)
+                self.rect.right = min(self.rect.right, right_bound)
+            else:
+                # floor: world edges
+                self.rect.left = max(self.rect.left, 0)
+                self.rect.right = min(self.rect.right, WIDTH)
+
+        # 6) If still airborne (no platform & not yet reached floor), do nothing until landing
+
+        # (Optional debug)
+        # print(f"[Enemy] State={self.state}  Plat={self.platform}  Floor={self.on_floor}  X={self.rect.x}")
+
         
         
 
     #take damage
     def take_damage(self, attacker_direction):
-        self.health -= 10
+        damage = random.randint(0, 12)
+        if damage == 0:
+            print("Miss")
+            return 
+        elif damage >= 10:
+            print("Critical Hit")
+            self.health -= damage + 2
+        else:
+            print(f"Hit! Damage: {damage}")
+            self.health -= damage
+        
         self.vel_y = -5
         self.knockback_timer = 10
-        self.direction = -attacker_direction
+        self.direction = attacker_direction
         if self.health <= 0:
+            print("Kill") 
             self.kill()
     
     def draw_health_bar(self, surface):
         bar_width = 40
         bar_height = 5
-        fill = (self.health /3 ) * bar_width
-        outline_rect = pygame.Rect(self.rect.x, self.rect.y - 10, bar_width, bar_height)
+        fill = (self.health /12 ) * bar_width
+        #outline_rect = pygame.Rect(self.rect.x, self.rect.y - 10, bar_width, bar_height)
         fill_rect = pygame.Rect(self.rect.x, self.rect.y - 10 , fill, bar_height)
         pygame.draw.rect(surface, GREEN, fill_rect)
-        pygame.draw.rect(surface, BLACK, outline_rect)
+        #pygame.draw.rect(surface, BLACK, outline_rect)
