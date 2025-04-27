@@ -23,6 +23,11 @@ platforms = generate_platforms()
 score = 0 
 font = pygame.font.SysFont(None, 36)
 
+spawners = []
+for plat in platforms:
+    spawner = Spawner(plat)
+    spawners.append(spawner)
+    
 # Create an enemy instance
 def spawn_enemies_on_platforms():
     enemies = pygame.sprite.Group()
@@ -30,14 +35,15 @@ def spawn_enemies_on_platforms():
         enemy = Enemy(plat.rect.centerx - 20, plat.rect.top - 60)
         enemy.platform = plat
         enemies.add(enemy)
+        for spawner in spawners:
+            if spawner.platform == plat:
+                spawner.current_enemy = enemy 
+                break 
     return enemies
 
 enemies = spawn_enemies_on_platforms()
 
-spawners = []
-for plat in platforms[-1:]:
-    spawner = Spawner(plat)
-    spawners.append(spawner)
+
 
 clock = pygame.time.Clock()
 running = True 

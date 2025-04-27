@@ -121,7 +121,7 @@ class Enemy(pygame.sprite.Sprite):
             return 
         elif damage >= 10:
             print("Critical Hit")
-            self.health -= damage + 2
+            self.health -= damage 
         else:
             print(f"Hit! Damage: {damage}")
             self.health -= damage
