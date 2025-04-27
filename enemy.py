@@ -8,7 +8,7 @@ class Enemy(pygame.sprite.Sprite):
         self.image = pygame.Surface((40, 60))
         self.image.fill(RED)
         self.rect = self.image.get_rect(topleft=(x, y))
-        self.health = 12
+        self.health = 100
 
         self.vel_x = 1
         self.vel_y = 0
@@ -136,7 +136,7 @@ class Enemy(pygame.sprite.Sprite):
     def draw_health_bar(self, surface):
         bar_width = 40
         bar_height = 5
-        fill = (self.health /12 ) * bar_width
+        fill = (self.health /100) * bar_width
         #outline_rect = pygame.Rect(self.rect.x, self.rect.y - 10, bar_width, bar_height)
         fill_rect = pygame.Rect(self.rect.x, self.rect.y - 10 , fill, bar_height)
         pygame.draw.rect(surface, GREEN, fill_rect)

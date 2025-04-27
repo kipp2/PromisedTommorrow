@@ -7,12 +7,14 @@ class Spawner:
         self.platform = platform
         self.timer = 0
         self.activate = False
-
-    def start(self):
-        self.timer = pygame.time.get_ticks()
-        self.activate = True
+        self.current_enemy = None 
 
     def update(self, enemies):
+
+        if self.current_enemy and not self.current_enemy.alive():
+            self.current_enemy = None
+            self.start()
+
         if self.activate and self.platform:
             now = pygame.time.get_ticks()
             if now - self.timer > 2000:
@@ -21,4 +23,9 @@ class Spawner:
                 enemy = Enemy(x, y)
                 enemy.platform = self.platform
                 enemies.add(enemy)
+                self.current_enemy = enemy 
                 self.activate = False 
+
+    def start(self):
+        self.timer = pygame.time.get_ticks()
+        self.activate = True

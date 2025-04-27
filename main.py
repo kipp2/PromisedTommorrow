@@ -114,13 +114,9 @@ while running:
                 direction = 1 if player.facing_right else -1
                 old_health = enemy.health
                 enemy.take_damage(direction)
-                if enemy.health <= 0 and old_health > 0:
-                    platform = enemy.platform  
+                if enemy.health <= 0 and old_health > 0:                  
                     score += 10 
-                    if platform:
-                        spawner = Spawner(platform)
-                        spawner.start()
-                        spawners.append(spawner)
+                    
     clock.tick(FPS)
     pygame.display.update()
 pygame.quit()
