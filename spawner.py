@@ -4,7 +4,7 @@ from enemy import Enemy
 
 class Spawner:
     def __init__(self, platform):
-        self.platforms = platform
+        self.platform = platform
         self.timer = 0
         self.activate = False
 
@@ -13,9 +13,9 @@ class Spawner:
         self.activate = True
 
     def update(self, enemies):
-        if self.activate:
+        if self.activate and self.platform:
             now = pygame.time.get_ticks()
-            if now - self.timer > 5000:
+            if now - self.timer > 2000:
                 x = self.platform.rect.centerx - 20
                 y = self.platform.rect.top - 60
                 enemy = Enemy(x, y)

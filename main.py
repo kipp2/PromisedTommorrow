@@ -35,6 +35,10 @@ def spawn_enemies_on_platforms():
 enemies = spawn_enemies_on_platforms()
 
 spawners = []
+for plat in platforms[-1:]:
+    spawner = Spawner(plat)
+    spawners.append(spawner)
+
 clock = pygame.time.Clock()
 running = True 
 game_state = "menu"
@@ -110,11 +114,13 @@ while running:
                 direction = 1 if player.facing_right else -1
                 old_health = enemy.health
                 enemy.take_damage(direction)
-                if enemy.health <= 0 and old_health > 0: 
+                if enemy.health <= 0 and old_health > 0:
+                    platform = enemy.platform  
                     score += 10 
-                    spawner = Spawner(enemy.platform)
-                    spawner.start()
-                    spawners.append(spawner)
+                    if platform:
+                        spawner = Spawner(platform)
+                        spawner.start()
+                        spawners.append(spawner)
     clock.tick(FPS)
     pygame.display.update()
 pygame.quit()
