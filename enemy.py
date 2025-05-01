@@ -18,12 +18,25 @@ class Enemy(pygame.sprite.Sprite):
         self.attack_range = 40
         self.knockback_timer = 0 
         self.knockback_force = 8 
+        self.original_color = RED
+        self.hit_timer = 0
+        self.flash_duration = 60
+        self.flash_toggle_interval = 5
 
 
     def update(self, platforms, player):
         # 1) Gravity & vertical movement
         self.vel_y += GRAVITY
         self.rect.y += self.vel_y
+
+        if self.hit_timer > 0:
+            if (self.hit_timer // self.flash_toggle_interval) % 2 == 0:
+                self.image.set_alpha(255)
+            else:
+                self.image.set_alpha(0)
+            self.hit_timer -= 1
+        else:
+            self.image.set_alpha(255)
 
         # 2) Knockback movement (if active)
         if self.knockback_timer > 0:
@@ -108,7 +121,7 @@ class Enemy(pygame.sprite.Sprite):
         # 6) If still airborne (no platform & not yet reached floor), do nothing until landing
 
         # (Optional debug)
-        # print(f"[Enemy] State={self.state}  Plat={self.platform}  Floor={self.on_floor}  X={self.rect.x}")
+            print(f"[Enemy] State={self.state}  Plat={self.platform} ")
 
         
         
@@ -116,6 +129,7 @@ class Enemy(pygame.sprite.Sprite):
     #take damage
     def take_damage(self, attacker_direction):
         damage = random.randint(0, 12)
+        self.hit_timer = self.flash_duration
         if damage == 0:
             print("Miss")
             return 

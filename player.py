@@ -16,12 +16,20 @@ class Player(pygame.sprite.Sprite):
         self.swinging = False
         self.health = 3
         self.facing_right = True
+        self.attack_cooldown = 0 
+    def can_attack(self):
+        return self.attack_cooldown == 0
 
     def update(self, platforms):
         self.vel_y += GRAVITY
 
         self.rect.x += self.vel_x
         self.rect.y += self.vel_y
+
+        if self.attack_cooldown >0:
+            self.attack_cooldown -= 1
+
+ 
 
         self.on_ground = False
         for platform in platforms:

@@ -79,11 +79,9 @@ while running:
         if keys[pygame.K_SPACE]:
             player.jump()
 
-        if keys[pygame.K_z]:
+        if keys[pygame.K_z] and player.can_attack():
             player.swinging = True
-        
-        else:
-            player.swinging = False
+            player.attack_cooldown = 30
         
 
     # Update player and enemy
@@ -110,8 +108,9 @@ while running:
         for platform in platforms:
             screen.blit(platform.image, platform.rect)
     
-        enemies.update(platforms, player)
+      
         for enemy in enemies:
+            enemy.update(platforms, player)
             enemy.draw_health_bar(screen)
             screen.blit(enemy.image, enemy.rect)
             if (
@@ -121,7 +120,8 @@ while running:
                 old_health = enemy.health
                 enemy.take_damage(direction)
                 if enemy.health <= 0 and old_health > 0:                  
-                    score += 10 
+                    score += 10     
+                player.swinging = False
                     
     clock.tick(FPS)
     pygame.display.update()
