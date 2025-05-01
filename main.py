@@ -81,7 +81,9 @@ while running:
 
         if keys[pygame.K_z] and player.can_attack():
             player.swinging = True
+            player.swing_duration = 10
             player.attack_cooldown = 30
+            player.hit_targets.clear()
         
 
     # Update player and enemy
@@ -119,9 +121,10 @@ while running:
                 direction = 1 if player.facing_right else -1
                 old_health = enemy.health
                 enemy.take_damage(direction)
+                player.hit_targets.add(enemy)
                 if enemy.health <= 0 and old_health > 0:                  
                     score += 10     
-                player.swinging = False
+                
                     
     clock.tick(FPS)
     pygame.display.update()

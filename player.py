@@ -17,6 +17,9 @@ class Player(pygame.sprite.Sprite):
         self.health = 3
         self.facing_right = True
         self.attack_cooldown = 0 
+        self.swing_duration = 0
+        self.hit_targets = set()
+
     def can_attack(self):
         return self.attack_cooldown == 0
 
@@ -29,7 +32,10 @@ class Player(pygame.sprite.Sprite):
         if self.attack_cooldown >0:
             self.attack_cooldown -= 1
 
- 
+        if self.swing_duration > 0:
+            self.swing_duration -= 1
+            if self.swing_duration == 0:
+                self.swinging = False
 
         self.on_ground = False
         for platform in platforms:
