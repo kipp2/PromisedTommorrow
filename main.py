@@ -1,11 +1,12 @@
 import pygame
 from pygame.locals import *
-from enemy import Enemy  # Import the Enemy class
+from enemy import Enemy  
 from player import Player
 from weapon import Weapon
 from text import Text
 from spawner import Spawner
 from platforms import generate_platforms, Platform
+from floating_text import Floating_Text
 from config import WIDTH, HEIGHT, FPS, GRAVITY, WHITE, BLACK
 import random
 
@@ -14,9 +15,10 @@ pygame.init()
 SIZE = WIDTH, HEIGHT
 
 screen = pygame.display.set_mode(SIZE)
-pygame.display.set_caption("PromisedTommorrow")
+pygame.display.set_caption("Promises Tommorrow")
 
 player = Player()
+floating_text = pygame.sprite.Group()
 player.rect.bottomleft = (0, HEIGHT - 100)
 weapon = Weapon(player)
 platforms = generate_platforms()
@@ -28,7 +30,7 @@ for plat in platforms:
     spawner = Spawner(plat)
     spawners.append(spawner)
     
-# Create an enemy instance
+
 def spawn_enemies_on_platforms():
     enemies = pygame.sprite.Group()
     for plat in platforms[1:]:
@@ -114,7 +116,7 @@ while running:
         for enemy in enemies:
             enemy.update(platforms, player)
             enemy.draw_health_bar(screen)
-            screen.blit(enemy.image, enemy.rect)
+            enemy.draw(screen)
             if (
             weapon.rect.colliderect(enemy.rect) and player.swinging and enemy.state != "idle"
             ):

@@ -22,6 +22,8 @@ class Enemy(pygame.sprite.Sprite):
         self.hit_timer = 0
         self.flash_duration = 60
         self.flash_toggle_interval = 5
+        self.floating_texts = pygame.sprite.Group()
+
 
 
     def update(self, platforms, player):
@@ -121,7 +123,7 @@ class Enemy(pygame.sprite.Sprite):
         # 6) If still airborne (no platform & not yet reached floor), do nothing until landing
 
         # (Optional debug)
-            print(f"[Enemy] State={self.state}  Plat={self.platform} ")
+            #print(f"[Enemy] State={self.state}  Plat={self.platform} ")
 
         
         
@@ -129,17 +131,26 @@ class Enemy(pygame.sprite.Sprite):
     #take damage
     def take_damage(self, attacker_direction):
         damage = random.randint(0, 12)
+        self.last_damage = damage 
         self.hit_timer = self.flash_duration
         if damage == 0:
             print("Miss")
+            txt, color = "Miss!", (200, 200, 200)
             return 
         elif damage >= 10:
             print("Critical Hit")
             self.health -= damage 
+            txt, color = "CRIT!", (255, 50, 50)
         else:
             print(f"Hit! Damage: {damage}")
             self.health -= damage
+            txt, color = f"-{damage}", (255, 50, 50)
         
+        from floating_text import Floating_Text
+        text = Floating_Text(txt, self.rect.centerx, self.rect.top, color)
+        self.floating_texts.add(text)
+        self.floating_texts.update() 
+
         self.vel_y = -5
         self.knockback_timer = 10
         self.direction = attacker_direction
@@ -154,4 +165,11 @@ class Enemy(pygame.sprite.Sprite):
         #outline_rect = pygame.Rect(self.rect.x, self.rect.y - 10, bar_width, bar_height)
         fill_rect = pygame.Rect(self.rect.x, self.rect.y - 10 , fill, bar_height)
         pygame.draw.rect(surface, GREEN, fill_rect)
+
         #pygame.draw.rect(surface, BLACK, outline_rect)
+
+    def draw(self, surface):
+        surface.blit(self.image, self.rect)
+        self.draw_health_bar(surface)
+        for text in self.floating_texts:
+            surface.blit(text.image, text.rect)
