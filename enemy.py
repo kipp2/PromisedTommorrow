@@ -148,9 +148,9 @@ class Enemy(pygame.sprite.Sprite):
         
         from floating_text import Floating_Text
         text = Floating_Text(txt, self.rect.centerx, self.rect.top, color)
-        self.floating_texts.add(text)
+        #self.floating_texts.add(text)
         self.floating_texts.update() 
-
+        self.floating_texts = pygame.sprite.Group([text for text in self.floating_texts if text.alive])
         self.vel_y = -5
         self.knockback_timer = 10
         self.direction = attacker_direction
