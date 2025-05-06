@@ -135,7 +135,7 @@ class Enemy(pygame.sprite.Sprite):
         self.hit_timer = self.flash_duration
         if damage == 0:
             print("Miss")
-            txt, color = "Miss!", (200, 200, 200)
+            txt, color = "Miss!", (200, 50, 50)
             return 
         elif damage >= 10:
             print("Critical Hit")

@@ -58,7 +58,7 @@ while running:
 
     if game_state == "menu":
         screen.fill(WHITE)
-        title = Text("Promised Tomorrow", (WIDTH // 2, HEIGHT // 2 - 50), 50)
+        title = Text("Promises Tomorrow", (WIDTH // 2, HEIGHT // 2 - 50), 50)
         start = Text("Press Enter to Start", (WIDTH // 2, HEIGHT // 2), 50)
         title.draw(screen)
         start.draw(screen)

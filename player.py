@@ -7,7 +7,7 @@ class Player(pygame.sprite.Sprite):
         self.image = pygame.Surface((40, 60))
         self.image.fill(BLUE)
         self.rect = self.image.get_rect()
-        self.rect.center = (400, 500)  # Example starting position
+        self.rect.center = (400, 500)  
 
         self.vel_x = 0
         self.vel_y = 0
