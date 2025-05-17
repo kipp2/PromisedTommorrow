@@ -1,7 +1,7 @@
 import pygame
 
 class Floating_Text(pygame.sprite.Sprite):
-    def __init__(self, text, x, y, color=(255, 255, 255), duration = 40):
+    def __init__(self, text, x, y, color=(255, 0, 0), duration = 40):
         super().__init__()
         self.font = pygame.font.SysFont("arial", 18)
         self.image = self.font.render(text, True, color)
